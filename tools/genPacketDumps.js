@@ -25,8 +25,8 @@ async function dump (version=CURRENT_VERSION, force = true) {
   const [port, v6] = [19132, await getPort()]
 
   console.log('Starting dump server', version)
-  //const handle = await vanillaServer.startServerAndWait2(version || CURRENT_VERSION, 1000 * 120, { 'server-port': port, 'server-portv6': v6 })
-  const handle = bds()
+  const handle = await vanillaServer.startServerAndWait2(version || CURRENT_VERSION, 1000 * 120, { 'server-port': port, 'server-portv6': v6 })
+  // const handle = bds()
 
   console.log('Started dump server', version)
   const client = new Client({

@@ -35,7 +35,7 @@ async function startServer(version = CURRENT_VERSION, ok) {
 
   const Item = require('../../types/Item')(version)
   const port = 19132
-  const server = new Server({ host: '0.0.0.0', port, version, offline: true })
+  const server = new Server({ host: '0.0.0.0', port, version, offline: true, compression_threshold: 1 })
   let loop
 
   const getPath = (packetPath) => join(__dirname, `../../data/${server.options.version}/${packetPath}`)
@@ -154,7 +154,7 @@ async function startServer(version = CURRENT_VERSION, ok) {
   }
 }
 
-module.exports = (version = CURRENT_VERSION) => {
+module.exports = [(version = CURRENT_VERSION) => {
   return new Promise((resolve, reject) => {
     let server = waitFor((res) => {
       resolve(startServer(version, res))
@@ -165,4 +165,5 @@ module.exports = (version = CURRENT_VERSION) => {
       process.exit(1)
     })
   })
-}
+}]
+module.exports[0]()
