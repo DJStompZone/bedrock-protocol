@@ -21,7 +21,7 @@ const { Server } = require('bedrock-protocol')
 const { loadWorld } = require('./serverChunks')
 const { join } = require('path')
 
-function hasDumps (version) {
+function hasDumps(version) {
   const root = join(__dirname, `../../data/${version}/sample/packets/`)
   if (!fs.existsSync(root) || getFiles(root).length < 10) {
     return false
@@ -35,7 +35,7 @@ async function startServer(version = CURRENT_VERSION, ok) {
 
   const Item = require('../../types/Item')(version)
   const port = 19132
-  const server = new Server({ host: '0.0.0.0', port, version })
+  const server = new Server({ host: '0.0.0.0', port, version, offline: true })
   let loop
 
   const getPath = (packetPath) => join(__dirname, `../../data/${server.options.version}/${packetPath}`)
@@ -78,7 +78,13 @@ async function startServer(version = CURRENT_VERSION, ok) {
 
       client.once('resource_pack_client_response', async rp => {
         // Tell the server we will compress everything (>=1 byte)
-        client.write('network_settings', { compression_threshold: 1 })
+        client.write('network_settings', {
+          "compression_threshold": 1,
+          "compression_algorithm": "deflate",
+          "client_throttle": false,
+          "client_throttle_threshold": 0,
+          "client_throttle_scalar": null
+        })
         // Send some inventory slots
         for (let i = 0; i < 3; i++) {
           client.queue('inventory_slot', { window_id: 120, slot: 0, item: new Item().toBedrock() })
@@ -91,7 +97,7 @@ async function startServer(version = CURRENT_VERSION, ok) {
         client.queue('set_time', { time: 5433771 })
         client.queue('set_difficulty', { difficulty: 1 })
         client.queue('set_commands_enabled', { enabled: true })
-        client.queue('adventure_settings', get('adventure_settings'))
+        // client.queue('adventure_settings', get('adventure_settings'))
         client.queue('biome_definition_list', get('biome_definition_list'))
         client.queue('available_entity_identifiers', get('available_entity_identifiers'))
         client.queue('update_attributes', get('update_attributes'))
@@ -109,11 +115,11 @@ async function startServer(version = CURRENT_VERSION, ok) {
         }
 
         // Uncomment below and comment above to send dumped chunks. We use bedrock-provider in this example which is still a WIP, some blocks may be broken.
-        // for (const file of fs.readdirSync(`../data/${server.options.version}/sample/chunks`)) {
-        //   const buffer = fs.readFileSync(`../data/${server.options.version}/sample/chunks/` + file)
-        //   // console.log('Sending chunk', buffer)
-        //   client.sendBuffer(buffer)
-        // }
+        for (const file of fs.readdirSync(getPath(`sample/chunks`))) {
+          const buffer = fs.readFileSync(getPath(`/sample/chunks/`) + file)
+          console.log('Sending chunk', buffer)
+          client.sendBuffer(buffer)
+        }
 
         // Constantly send this packet to the client to tell it the center position for chunks. The client should then request these
         // missing chunks from the us if it's missing any within the radius. `radius` is in blocks.
@@ -148,13 +154,15 @@ async function startServer(version = CURRENT_VERSION, ok) {
   }
 }
 
-module.exports = (version = CURRENT_VERSION)=> {
-  let server
-  waitFor((res) => {
-    server = startServer(version, res)
-  }, 1000 * 60 /* Wait 60 seconds for the server to start */, function onTimeout() {
-    console.error('Server did not start in time')
-    server?.close()
-    process.exit(1)
+module.exports = (version = CURRENT_VERSION) => {
+  return new Promise((resolve, reject) => {
+    let server = waitFor((res) => {
+      resolve(startServer(version, res))
+    }, 1000 * 60 /* Wait 60 seconds for the server to start */, function onTimeout() {
+      console.error('Server did not start in time')
+      server?.close()
+      reject('timeout')
+      process.exit(1)
+    })
   })
 }

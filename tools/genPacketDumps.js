@@ -1,5 +1,5 @@
 // Collect sample packets needed for `serverTest.js`
-process.env.DEBUG = 'minecraft-protocol'
+// process.env.DEBUG = 'minecraft-protocol'
 const fs = require('fs')
 const vanillaServer = require('../tools/startVanillaServer')
 const bds = require('../examples/server/server')
