@@ -11,16 +11,24 @@
  * First, dump packets for version 1.16.210 by running `npm run dumpPackets`.
  * Then you can run `node server.js <version>` to start this script.
  */
+const { CURRENT_VERSION } = require('../../src/options')
 process.env.DEBUG = 'minecraft-protocol' // packet logging
-// const fs = require('fs')
+const fs = require('fs')
+const { serialize, waitFor, getFiles } = require('../../src/datatypes/util')
 const { Server } = require('bedrock-protocol')
 
-const { hasDumps } = require('../../tools/genPacketDumps')
-const { waitFor } = require('../../src/datatypes/util')
+//const { hasDumps } = require('../../tools/genPacketDumps')
 const { loadWorld } = require('./serverChunks')
 const { join } = require('path')
 
-async function startServer (version = '1.17.10', ok) {
+function hasDumps (version) {
+  const root = join(__dirname, `../../data/${version}/sample/packets/`)
+  if (!fs.existsSync(root) || getFiles(root).length < 10) {
+    return false
+  }
+  return true
+}
+async function startServer(version = CURRENT_VERSION, ok) {
   if (!hasDumps(version)) {
     throw Error('You need to dump some packets first. Run tools/genPacketDumps.js')
   }
@@ -30,7 +38,8 @@ async function startServer (version = '1.17.10', ok) {
   const server = new Server({ host: '0.0.0.0', port, version })
   let loop
 
-  const getPath = (packetPath) => join(__dirname, `../data/${server.options.version}/${packetPath}`)
+  const getPath = (packetPath) => join(__dirname, `../../data/${server.options.version}/${packetPath}`)
+
   const get = (packetName) => require(getPath(`sample/packets/${packetName}.json`))
 
   server.listen()
@@ -139,11 +148,13 @@ async function startServer (version = '1.17.10', ok) {
   }
 }
 
-let server
-waitFor((res) => {
-  server = startServer(process.argv[2], res)
-}, 1000 * 60 /* Wait 60 seconds for the server to start */, function onTimeout () {
-  console.error('Server did not start in time')
-  server?.close()
-  process.exit(1)
-})
+module.exports = (version = CURRENT_VERSION)=> {
+  let server
+  waitFor((res) => {
+    server = startServer(version, res)
+  }, 1000 * 60 /* Wait 60 seconds for the server to start */, function onTimeout() {
+    console.error('Server did not start in time')
+    server?.close()
+    process.exit(1)
+  })
+}

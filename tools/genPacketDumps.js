@@ -1,7 +1,8 @@
 // Collect sample packets needed for `serverTest.js`
-// process.env.DEBUG = 'minecraft-protocol'
+process.env.DEBUG = 'minecraft-protocol'
 const fs = require('fs')
 const vanillaServer = require('../tools/startVanillaServer')
+const bds = require('../examples/server/server')
 const { Client } = require('../src/client')
 const { serialize, waitFor, getFiles } = require('../src/datatypes/util')
 const { CURRENT_VERSION } = require('../src/options')
@@ -18,12 +19,14 @@ function hasDumps (version) {
 
 let loop
 
-async function dump (version, force = true) {
+async function dump (version=CURRENT_VERSION, force = true) {
   const random = (Math.random() * 1000) | 0
-  const [port, v6] = [await getPort(), await getPort()]
+  //const [port, v6] = [await getPort(), await getPort()]
+  const [port, v6] = [19132, await getPort()]
 
   console.log('Starting dump server', version)
-  const handle = await vanillaServer.startServerAndWait2(version || CURRENT_VERSION, 1000 * 120, { 'server-port': port, 'server-portv6': v6 })
+  //const handle = await vanillaServer.startServerAndWait2(version || CURRENT_VERSION, 1000 * 120, { 'server-port': port, 'server-portv6': v6 })
+  const handle = bds()
 
   console.log('Started dump server', version)
   const client = new Client({
@@ -96,7 +99,7 @@ async function dump (version, force = true) {
 }
 
 if (!module.parent) {
-  dump(null, true).then(() => {
+  dump(CURRENT_VERSION, true).then(() => {
     console.log('Successfully dumped packets')
   })
 }
