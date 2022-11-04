@@ -1,9 +1,9 @@
 # bedrock-protocol
 [![NPM version](https://img.shields.io/npm/v/bedrock-protocol.svg)](http://npmjs.com/package/bedrock-protocol)
 [![Build Status](https://github.com/PrismarineJS/bedrock-protocol/workflows/CI/badge.svg)](https://github.com/PrismarineJS/bedrock-protocol/actions?query=workflow%3A%22CI%22)
-[![Discord](https://img.shields.io/badge/chat-on%20discord-brightgreen.svg)](https://discord.gg/GsEFRM8)
 [![Try it on gitpod](https://img.shields.io/badge/try-on%20gitpod-brightgreen.svg)](https://gitpod.io/#https://github.com/PrismarineJS/bedrock-protocol)
 
+[![Official Discord](https://img.shields.io/static/v1.svg?label=OFFICIAL&message=DISCORD&color=blue&logo=discord&style=for-the-badge)](https://discord.gg/GsEFRM8)
 
 Minecraft Bedrock Edition (aka MCPE) protocol library, supporting authentication and encryption. Help [contribute](CONTRIBUTING.md).
 
@@ -11,7 +11,7 @@ Minecraft Bedrock Edition (aka MCPE) protocol library, supporting authentication
 
 ## Features
 
- - Supports Minecraft Bedrock version 1.16.201, 1.16.210, 1.16.220, 1.17.0, 1.17.10, 1.17.30, 1.17.40, 1.18.0, 1.18.11, 1.18.30, 1.19.1, 1.19.10, 1.19.20, 1.19.21, 1.19.30
+ - Supports Minecraft Bedrock version 1.16.201, 1.16.210, 1.16.220, 1.17.0, 1.17.10, 1.17.30, 1.17.40, 1.18.0, 1.18.11, 1.18.30, 1.19.1, 1.19.10, 1.19.20, 1.19.21, 1.19.30, 1.19.40
  - Parse and serialize packets as JavaScript objects
  - Automatically respond to keep-alive packets
  - [Proxy and mitm connections](docs/API.md#proxy-docs)
