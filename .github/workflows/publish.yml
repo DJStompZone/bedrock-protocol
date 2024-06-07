@@ -1,8 +1,5 @@
 name: npm-publish
-on:
-  push:
-    branches:
-      - master # Change this to your default branch
+on: workflow_dispatch
 jobs:
   npm-publish:
     name: npm-publish
