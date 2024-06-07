@@ -7,7 +7,7 @@ const { getFiles, waitFor } = require('../src/datatypes/util')
 
 function head (url) {
   return new Promise((resolve, reject) => {
-    const req = http.request(url, { method: 'HEAD', timeout: 500 }, resolve)
+    const req = http.request(url, { method: 'HEAD', timeout: 1000 }, resolve)
     req.on('error', reject)
     req.on('timeout', () => { req.destroy(); debug('HEAD request timeout'); reject(new Error('timeout')) })
     req.end()
@@ -57,7 +57,8 @@ async function download (os, version, path = 'bds-') {
   for (let i = 0; i < 8; i++) { // Check for the latest server build for version (major.minor.patch.BUILD)
     const u = url(os, `${verStr}.${String(i).padStart(2, '0')}`)
     debug('Opening', u, Date.now())
-    const ret = await head(u)
+    let ret
+    try { ret = await head(u) } catch (e) { continue }
     if (ret.statusCode === 200) {
       found = u
       debug('Found server', ret.statusCode)

@@ -49,7 +49,11 @@ class RelayPlayer extends Player {
     } catch (e) {
       this.server.deserializer.dumpFailedBuffer(packet, this.connection.address)
       console.error(this.connection.address, e)
-      this.disconnect('Server packet parse error')
+
+      if (!this.options.omitParseErrors) {
+        this.disconnect('Server packet parse error')
+      }
+
       return
     }
     const name = des.data.name
@@ -182,12 +186,15 @@ class Relay extends Server {
   async openUpstreamConnection (ds, clientAddr) {
     const options = {
       authTitle: this.options.authTitle,
+      flow: this.options.flow,
+      deviceType: this.options.deviceType,
       offline: this.options.destination.offline ?? this.options.offline,
       username: this.options.offline ? ds.profile.name : ds.profile.xuid,
       version: this.options.version,
       realms: this.options.destination.realms,
       host: this.options.destination.host,
       port: this.options.destination.port,
+      batchingInterval: this.options.batchingInterval,
       onMsaCode: (code) => {
         if (this.options.onMsaCode) {
           this.options.onMsaCode(code, ds)

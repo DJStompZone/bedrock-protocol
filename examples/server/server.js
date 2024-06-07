@@ -62,7 +62,8 @@ async function startServer(version = CURRENT_VERSION, ok) {
         must_accept: false,
         has_scripts: false,
         behaviour_packs: [],
-        texture_packs: []
+        texture_packs: [],
+        resource_pack_links: []
       })
 
       // ResourcePackStack is sent by the server to send the order in which resource packs and behaviour packs
